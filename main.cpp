@@ -47,5 +47,10 @@ int main(){
     b.middleOrderTraversal();
     std::cout<<std::endl;
     b.postOrderTraversal();
-    std::cout<<std::endl;        
+    std::cout<<std::endl;
+    auto result=b.find(3);
+    //std::cout<<result->Data;
+    bool res = b.deleteNode(6);
+    b.levelOrderTraversal();//correct
+
 }

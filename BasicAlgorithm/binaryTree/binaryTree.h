@@ -11,6 +11,10 @@ private:
         T Data;
         binaryTreeNode* left=nullptr;
         binaryTreeNode* right=nullptr;
+        ~binaryTreeNode(){
+            left=nullptr;
+            right=nullptr;            
+        }
     };
     binaryTreeNode* root;
     unsigned int nodeNum;
@@ -24,6 +28,13 @@ public:
     void levelOrderTraversal();//层序
     unsigned int leafNodesNum();
     void insterNode(const T& node);
+    binaryTreeNode* find(const T& target);
+    binaryTreeNode* findMin(binaryTreeNode* node);
+    binaryTreeNode* findMax(binaryTreeNode* node);
+
+    binaryTreeNode* deleteFindMin(binaryTreeNode* node);
+    binaryTreeNode* deleteFindMax(binaryTreeNode* node);
+    bool deleteNode(const T& target);
     ~binaryTree();
 };
 
@@ -125,7 +136,7 @@ template <typename T> void binaryTree<T>::postOrderTraversal()
                 temp=nullptr;
             }
         }
-    }    
+    }
 }
 
 template <typename T> unsigned int binaryTree<T>::leafNodesNum()
@@ -186,5 +197,141 @@ template<typename T> void binaryTree<T>::insterNode(const T& node){
         root=new binaryTreeNode();
         root->Data=node;
     }        
+}
+
+template<typename T> typename binaryTree<T>::binaryTreeNode* binaryTree<T>::find(const T& target){//this define
+    binaryTreeNode* temp=root;
+    binaryTreeNode* result=nullptr;
+    while (temp)
+    {
+        if (target<temp->Data)
+        {
+            temp=temp->left;
+        }else if (target>temp->Data)
+        {
+            temp=temp->right;
+        }else
+        {
+            result=temp;
+            temp=nullptr;
+        }                        
+    }
+    return result;
+}
+
+template<typename T> typename binaryTree<T>::binaryTreeNode* binaryTree<T>::findMax(binaryTree<T>::binaryTreeNode* node){
+    while (node->right!=nullptr)
+    {
+        node=node->right;
+    }
+    return node;
+}
+template<typename T> typename binaryTree<T>::binaryTreeNode* binaryTree<T>::findMin(binaryTree<T>::binaryTreeNode* node){
+    while (node->left!=nullptr)
+    {
+        node=node->left;
+    }
+    return node;
+}
+
+
+template<typename T> typename binaryTree<T>::binaryTreeNode* binaryTree<T>::deleteFindMax(binaryTree<T>::binaryTreeNode* node){
+    binaryTreeNode* pre;
+    binaryTreeNode* result=nullptr;
+    while (node->right!=nullptr)
+    {
+        pre=node;
+        node=node->right;
+    }
+    if (node->left)
+    {
+        node->left->right=node;
+        node->left->left=pre->left;
+        result=node->left;
+        node->left=nullptr;
+        
+    }else
+    {
+        result=node;
+        pre->right=nullptr;
+    }    
+    return result;
+}
+template<typename T> typename binaryTree<T>::binaryTreeNode* binaryTree<T>::deleteFindMin(binaryTree<T>::binaryTreeNode* node){
+    binaryTreeNode* pre;
+    binaryTreeNode* result=nullptr;
+    while (node->left!=nullptr)
+    {
+        pre=node;
+        node=node->left;
+    }
+    if (node->right)
+    {
+        node->right->left=node;
+        node->right->right=pre->right;
+        result=node->right;
+        node->right=nullptr;
+    }else
+    {
+        result=node;
+        pre->left=nullptr;
+    }    
+    return result;
+}
+
+template<typename T> bool binaryTree<T>::deleteNode(const T& target){
+    binaryTreeNode* temp=root;
+    binaryTreeNode* pre=nullptr;
+    while (temp)
+    {
+        if (target<temp->Data)
+        {
+            pre=temp;
+            temp=temp->left;
+        }else if (target>temp->Data)
+        {
+            pre=temp;
+            temp=temp->right;
+        }else
+        {
+            break;
+        }                        
+    }
+    if (temp->left==nullptr&&temp->right==nullptr)
+    {
+        pre->left==temp?pre->left=nullptr:pre->right=nullptr;
+        delete temp;
+        return true;
+    }else if (temp->right==nullptr&&temp->left!=nullptr)
+    {
+        pre->left==temp?pre->left=temp->left:pre->right=temp->left;
+        delete temp;
+        return true;
+    }else if (temp->right!=nullptr&&temp->left==nullptr)
+    {
+        pre->left==temp?pre->left=temp->right:pre->right=temp->right;
+        delete temp;
+        return true;
+    }else if(temp->right!=nullptr&&temp->left!=nullptr)
+    {
+        if (pre!=nullptr)
+        {   
+            if (pre->left==temp)
+            {
+                pre->left=deleteFindMax(temp);       
+            }else
+            {
+                pre->right=deleteFindMin(temp);                
+            }                                                
+            delete temp;
+        }else{
+            //TODO
+            temp=findMax(temp->left);
+            T tempData=temp->Data;
+            deleteNode(temp->Data);
+            root->Data=tempData;
+        }
+        return true;        
+    }            
 }
 #endif
