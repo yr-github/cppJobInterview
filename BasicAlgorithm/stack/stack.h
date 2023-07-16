@@ -49,6 +49,11 @@ template <typename T> bool stackCustomer<T>::push(const T& node){
 }
 
 template <typename T> T& stackCustomer<T>::pop(){
+    static T default_value;
+    if (isEmpty())
+    {
+        return default_value;
+    }    
     T& result = this->container[length-1];
     this->length--;
     return result;
